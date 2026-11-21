@@ -28,6 +28,20 @@
       "ref",
       "logged",
       "scope"
+    ],
+    "sittings.tsv": [
+      "id",
+      "learner",
+      "seated",
+      "handed",
+      "medium"
+    ],
+    "study_log.tsv": [
+      "id",
+      "learner",
+      "question",
+      "seen_at",
+      "note"
     ]
   },
   "references": [
@@ -49,6 +63,26 @@
     [
       "learners.tsv",
       "sheet",
+      "questions.tsv"
+    ],
+    [
+      "sittings.tsv",
+      "learner",
+      "learners.tsv"
+    ],
+    [
+      "sittings.tsv",
+      "handed",
+      "questions.tsv"
+    ],
+    [
+      "study_log.tsv",
+      "learner",
+      "learners.tsv"
+    ],
+    [
+      "study_log.tsv",
+      "question",
       "questions.tsv"
     ]
   ],
