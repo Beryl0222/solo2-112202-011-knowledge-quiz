@@ -1,0 +1,56 @@
+{
+  "columns": {
+    "cases.tsv": [
+      "id",
+      "phase",
+      "lineage",
+      "text"
+    ],
+    "questions.tsv": [
+      "id",
+      "basis",
+      "ability",
+      "stem",
+      "option_1",
+      "option_2",
+      "key"
+    ],
+    "learners.tsv": [
+      "id",
+      "needs",
+      "seen",
+      "sheet",
+      "max_items",
+      "responses"
+    ],
+    "correction_log.tsv": [
+      "id",
+      "ref",
+      "logged",
+      "scope"
+    ]
+  },
+  "references": [
+    [
+      "questions.tsv",
+      "basis",
+      "cases.tsv"
+    ],
+    [
+      "correction_log.tsv",
+      "ref",
+      "questions.tsv"
+    ],
+    [
+      "learners.tsv",
+      "seen",
+      "questions.tsv"
+    ],
+    [
+      "learners.tsv",
+      "sheet",
+      "questions.tsv"
+    ]
+  ],
+  "compound_keys": []
+}
