@@ -1,0 +1,261 @@
+{
+  "schema_version": 1,
+  "abilities": {
+    "状态边界": {
+      "agreed": true,
+      "description": "区分隔离、待检、未判废、已合格、放行与可领用等状态。"
+    },
+    "时间边界": {
+      "agreed": true,
+      "description": "按被问时点可见的材料判断，不用后出结论回填当时状态。"
+    },
+    "例外范围": {
+      "agreed": true,
+      "description": "识别例外条款明确指向的对象、工位、封签或回执，不扩大到其他批次。"
+    }
+  },
+  "rules": {
+    "R-NEUTRAL-DISPOSITION": {
+      "text": "“未判废”“未判不合格”只排除了一种负面结论，不推出合格、放行或可领用。",
+      "misread_code": "NEGATIVE_DISPOSITION_AS_POSITIVE"
+    },
+    "R-PENDING-ISOLATION": {
+      "text": "已隔离且报告/合格结论未到时，物料仍处于待检控制，不能按六盒全部可领处理。"
+    },
+    "R-AS-OF": {
+      "text": "历史时点判断只可使用该时点已经可见的结论；之后形成的合格结论只能作对照，不能回填。"
+    },
+    "R-NAMED-EXCEPTION": {
+      "text": "“除某对象外”“仅某对象”的例外只覆盖文字明确点名的范围，不能扩及同批其他对象或另一批次。",
+      "misread_code": "EXCEPTION_SCOPE_EXPANDED"
+    },
+    "R-SEAL-TYPE": {
+      "text": "解除运输封不等于解除待检标志；一个动作只改变它明确对应的控制。",
+      "misread_code": "PARTIAL_RELEASE_OVERGENERALIZED"
+    },
+    "R-RECEIPT-VS-PROCESS": {
+      "text": "完成送检或检验过程不等于持有带号合格回执；回执主体以“仅”后明确记载为准。",
+      "misread_code": "PROCESS_STATUS_AS_QUALIFIED_EVIDENCE"
+    },
+    "R-PICKUP-EMBARGO": {
+      "text": "已判合格或交回隔离钥匙不自动产生即时领用权；明确的验收后等待/提领限制仍须遵守。",
+      "misread_code": "QUALIFIED_AS_IMMEDIATE_PICKUP"
+    }
+  },
+  "misread_codes": {
+    "NEGATIVE_DISPOSITION_AS_POSITIVE": "把未判废/未判不合格误读成可领或已放行",
+    "LATER_RECORD_BACKDATED": "把时点之后才出现的结论当成当时已知",
+    "EXCEPTION_SCOPE_EXPANDED": "把点名例外扩大到未点名对象或另一批",
+    "EXCEPTION_WRONG_BATCH": "把一句例外套用到另一批/另一工位",
+    "PARTIAL_RELEASE_OVERGENERALIZED": "把运输封解除误读成待检状态解除",
+    "PROCESS_STATUS_AS_QUALIFIED_EVIDENCE": "把已送检/完成送检误读成已有合格回执",
+    "QUALIFIED_AS_IMMEDIATE_PICKUP": "把合格误读成不受提领时间限制"
+  },
+  "clues": {
+    "CLUE-NEUTRAL-DISPOSITION": {
+      "name": "否定式处置是中性状态",
+      "ability": "状态边界"
+    },
+    "CLUE-AS-OF-VISIBILITY": {
+      "name": "按询问时点截断证据",
+      "ability": "时间边界"
+    },
+    "CLUE-NAMED-EXCEPTION": {
+      "name": "例外仅覆盖点名对象",
+      "ability": "例外范围"
+    },
+    "CLUE-SEAL-TYPE": {
+      "name": "运输封与待检标志是两种控制",
+      "ability": "例外范围"
+    },
+    "CLUE-RECEIPT-HOLDER": {
+      "name": "合格回执与送检过程分离",
+      "ability": "例外范围"
+    },
+    "CLUE-PICKUP-EMBARGO": {
+      "name": "合格后仍有提领限制",
+      "ability": "状态边界"
+    }
+  },
+  "memory_groups": {
+    "MG-C1-REWRITE": {
+      "name": "批甲隔离待检题的改写组",
+      "recognizable_basis": "R2",
+      "questions": ["Q1", "Q3"],
+      "case_families": ["C1", "C3"],
+      "note": "R2 明确记载 Q3 由 C1 的交接练习变换背景，并保留相同识别线索。"
+    }
+  },
+  "questions": {
+    "Q1": {
+      "as_of": "05:20",
+      "target": "六盒",
+      "clue_ids": ["CLUE-NEUTRAL-DISPOSITION"],
+      "memory_group": "MG-C1-REWRITE",
+      "decision_contexts": [
+        {
+          "id": "C1_05:20_唯一可见片段",
+          "supported_option": 1,
+          "rule_ids": ["R-PENDING-ISOLATION", "R-NEUTRAL-DISPOSITION"],
+          "support": [
+            {"case": "C1", "at": "05:20", "quote": "已隔离六盒，送检抽两盒，报告还没到。"},
+            {"case": "C1", "at": "05:20", "quote": "隔离区记录未判废。"}
+          ]
+        }
+      ],
+      "distractor_readings": {
+        "2": "NEGATIVE_DISPOSITION_AS_POSITIVE"
+      }
+    },
+    "Q2": {
+      "as_of": "05:30",
+      "target": "05:30 值班员可确认的合格盒数",
+      "clue_ids": ["CLUE-AS-OF-VISIBILITY"],
+      "decision_contexts": [
+        {
+          "id": "按05:30截断",
+          "supported_option": 2,
+          "rule_ids": ["R-AS-OF", "R-PENDING-ISOLATION"],
+          "support": [
+            {"case": "C1", "at": "05:20", "quote": "报告还没到。"}
+          ]
+        }
+      ],
+      "contrast_evidence": [
+        {"case": "C2", "at": "09:10", "quote": "六盒内已有两盒手工复验，合格两盒可归还。", "allowed_role": "只能作为后出对照，不能证明05:30已知两盒合格。"}
+      ],
+      "distractor_readings": {
+        "1": "LATER_RECORD_BACKDATED"
+      }
+    },
+    "Q3": {
+      "as_of": null,
+      "target": "该批框内六件",
+      "clue_ids": ["CLUE-NEUTRAL-DISPOSITION"],
+      "memory_group": "MG-C1-REWRITE",
+      "decision_contexts": [
+        {
+          "id": "C3明文未放行",
+          "supported_option": 2,
+          "rule_ids": ["R-NEUTRAL-DISPOSITION"],
+          "support": [
+            {"case": "C3", "at": null, "quote": "抽查未判不合格，未放行。"}
+          ]
+        }
+      ],
+      "distractor_readings": {
+        "1": "NEGATIVE_DISPOSITION_AS_POSITIVE"
+      }
+    },
+    "Q4": {
+      "as_of": null,
+      "target": "最右侧 A3 袋",
+      "clue_ids": ["CLUE-NAMED-EXCEPTION", "CLUE-SEAL-TYPE"],
+      "decision_contexts": [
+        {
+          "id": "A3仍挂待检标志",
+          "supported_option": 2,
+          "rule_ids": ["R-NAMED-EXCEPTION", "R-SEAL-TYPE"],
+          "support": [
+            {"case": "C4", "at": null, "quote": "除最右侧 A3 之外全都可领。"},
+            {"case": "C4", "at": null, "quote": "A3 只解除运输封，不解除待检标志。"}
+          ]
+        }
+      ],
+      "distractor_readings": {
+        "1": "PARTIAL_RELEASE_OVERGENERALIZED"
+      }
+    },
+    "Q5": {
+      "as_of": null,
+      "target": null,
+      "target_note": "题干只说“可不复测直接领用吗”，未写明 W3 还是须进二工位重测的 W1/W2。",
+      "clue_ids": ["CLUE-NAMED-EXCEPTION"],
+      "decision_contexts": [
+        {
+          "id": "若询问W3",
+          "supported_option": 1,
+          "rule_ids": ["R-NAMED-EXCEPTION"],
+          "support": [
+            {"case": "C5", "at": null, "quote": "仅 W3 可直接领用。"}
+          ]
+        },
+        {
+          "id": "若询问进入二工位重测的W1/W2",
+          "supported_option": 2,
+          "rule_ids": ["R-NAMED-EXCEPTION"],
+          "support": [
+            {"case": "C5", "at": null, "quote": "送检报告同意 W 两托进入二工位重测"}
+          ]
+        }
+      ],
+      "ambiguity_witness": "补上询问对象为 W3 或 W1/W2，答案会在两个选项间翻转；工位/托号条件没有被题干或手记固定。应回编写明对象，不能靠删除一个选项消歧。",
+      "medium_review_notes": [
+        "若 medium 只证明学员接触过整份 W 托报告、但没有固定口述对象，不能用完整报告反推题干未写明的具体托号；SE3 纸卷同样以题面固定条件为准。"
+      ],
+      "distractor_readings": {}
+    },
+    "Q6": {
+      "as_of": null,
+      "target": "带号合格回执持有托",
+      "clue_ids": ["CLUE-RECEIPT-HOLDER", "CLUE-NAMED-EXCEPTION"],
+      "decision_contexts": [
+        {
+          "id": "仅蓝签F2有回执",
+          "supported_option": 2,
+          "rule_ids": ["R-RECEIPT-VS-PROCESS", "R-NAMED-EXCEPTION"],
+          "support": [
+            {"case": "C6", "at": null, "quote": "其余已完成送检。"},
+            {"case": "C6", "at": null, "quote": "仅蓝签 F2 有带号合格回执。"}
+          ]
+        }
+      ],
+      "distractor_readings": {
+        "1": "PROCESS_STATUS_AS_QUALIFIED_EVIDENCE"
+      }
+    },
+    "Q7": {
+      "as_of": null,
+      "target": "交回隔离钥匙时的该批",
+      "clue_ids": ["CLUE-PICKUP-EMBARGO"],
+      "decision_contexts": [
+        {
+          "id": "提领限制仍是唯一明文时间规则",
+          "supported_option": 1,
+          "rule_ids": ["R-PICKUP-EMBARGO"],
+          "support": [
+            {"case": "C7", "at": null, "quote": "隔离钥匙已交回"},
+            {"case": "C7", "at": null, "quote": "封签记录单注明验收后两小时才可提。"}
+          ],
+          "editor_scope": "本题考“钥匙交回/合格结论不覆盖明文提领限制”；选项1是该限制对应的唯一规则性答案。若新案要主张交钥匙时已满两小时，必须另给验收与交钥匙时间。"
+        }
+      ],
+      "distractor_readings": {
+        "2": "QUALIFIED_AS_IMMEDIATE_PICKUP"
+      }
+    }
+  },
+  "correction_effects": {
+    "R1": {
+      "question": "Q5",
+      "kind": "answer_defect",
+      "active_from_log": true,
+      "effect": "invalidate_old_responses",
+      "repair_direction": "把询问对象固定为 W3 或 W1/W2，并让学员当场看到该条件；旧卷不能用补正后的对象反推旧作答。"
+    },
+    "R2": {
+      "question": "Q3",
+      "kind": "relation_discovery",
+      "active_from_log": true,
+      "effect": "memory_group_confirmed",
+      "memory_group": "MG-C1-REWRITE"
+    }
+  },
+  "cohorts": [
+    {
+      "id": "COHORT-S-E",
+      "name": "同修状态边界与例外范围的学员",
+      "learner_ids": ["L1", "L4"]
+    }
+  ]
+}

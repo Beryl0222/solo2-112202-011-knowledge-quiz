@@ -1,0 +1,44 @@
+{
+  "schema_version": 1,
+  "cases": [
+    {
+      "id": "C9",
+      "phase": "交接",
+      "lineage": "批壬-新编",
+      "text": "二工位记录：K1、K2 需重测；K3 工位已完成首件确认，可直接领用。"
+    }
+  ],
+  "question": {
+    "id": "Q9-CANDIDATE-AMBIGUOUS",
+    "basis": ["C9"],
+    "ability": "例外范围",
+    "lineage": "批壬-新编",
+    "stem": "这批可以不重测直接领用吗？",
+    "options": [
+      {"id": 1, "text": "可以"},
+      {"id": 2, "text": "不可以"}
+    ],
+    "key": 1,
+    "clue_ids": ["CLUE-NAMED-EXCEPTION"],
+    "decision_contexts": [
+      {
+        "id": "若问K3",
+        "supported_option": 1,
+        "rule_ids": ["R-NAMED-EXCEPTION"],
+        "support": [
+          {"case": "C9", "at": null, "quote": "K3 工位已完成首件确认，可直接领用。"}
+        ]
+      },
+      {
+        "id": "若问K1或K2",
+        "supported_option": 2,
+        "rule_ids": ["R-NAMED-EXCEPTION"],
+        "support": [
+          {"case": "C9", "at": null, "quote": "K1、K2 需重测"}
+        ]
+      }
+    ],
+    "ambiguity_witness": "补上“问 K3”或“问 K1/K2”、以及工位是否已经切换，答案会翻转；应回编写明对象，不能删除一个选项。",
+    "distractor_readings": {}
+  }
+}

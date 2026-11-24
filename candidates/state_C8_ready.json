@@ -1,0 +1,40 @@
+{
+  "schema_version": 1,
+  "cases": [
+    {
+      "id": "C8",
+      "phase": "交接",
+      "lineage": "批辛-新编",
+      "text": "14:05 八托全部挂待检黄牌；报告仅显示三托合格并可归还，其余未见结论。交接记录写“未见不合格”。"
+    }
+  ],
+  "question": {
+    "id": "Q8-CANDIDATE",
+    "basis": ["C8"],
+    "ability": "状态边界",
+    "lineage": "批辛-新编",
+    "stem": "14:10 领料员能否把八托全部领走？",
+    "as_of": "14:10",
+    "options": [
+      {"id": 1, "text": "不能；三托合格不代表其余五托可领，“未见不合格”也不是放行"},
+      {"id": 2, "text": "能；交接记录写了“未见不合格”"}
+    ],
+    "key": 1,
+    "clue_ids": ["CLUE-NEUTRAL-DISPOSITION"],
+    "decision_contexts": [
+      {
+        "id": "14:10唯一可见交接片",
+        "supported_option": 1,
+        "rule_ids": ["R-NEUTRAL-DISPOSITION", "R-PENDING-ISOLATION"],
+        "support": [
+          {"case": "C8", "at": "14:05", "quote": "八托全部挂待检黄牌"},
+          {"case": "C8", "at": "14:05", "quote": "其余未见结论"},
+          {"case": "C8", "at": "14:05", "quote": "未见不合格"}
+        ]
+      }
+    ],
+    "distractor_readings": {
+      "2": "NEGATIVE_DISPOSITION_AS_POSITIVE"
+    }
+  }
+}
